@@ -59,6 +59,41 @@ app.post('/register', (req, res) => {
     });
 });
 
+app.get('/login', (req, res) => {
+    res.render('login');
+});
+
+app.post('/login', (req, res) => {
+    const user = new User({
+        username: req.body.username,
+        password: req.body.password
+    });
+
+    req.login(user, (error)=>{
+        if(error){
+            console.log(error);
+            res.redirect('/login') ;
+        } else {
+            passport.authenticate('local')(req, res, ()=>{
+                res.redirect('/secrets');
+            });
+        }
+    })
+});
+
+app.get('/secrets', (req, res) => {
+    if(req.isAuthenticated()){
+        res.render('secrets');
+    } else {
+        res.redirect('/');
+    }
+});
+
+app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+});
+
 const port = 3000;
 
 app.listen(port, () => {
